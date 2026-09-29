@@ -25,7 +25,9 @@
             <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-cursor: hand;" text="Müşteriler" />
             <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-cursor: hand;" text="Stok Yönetimi" />
             <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-cursor: hand;" text="Faturalar" />
-            <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-cursor: hand;" text="Çıkış Yap">
+
+            <!-- Çıkış Yap butonu güncellendi (fx:id ve onAction eklendi) -->
+            <Button fx:id="logoutButton" onAction="#onLogoutButtonClick" maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-cursor: hand;" text="Çıkış Yap">
                 <VBox.margin>
                     <Insets top="50.0" />
                 </VBox.margin>
