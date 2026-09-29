@@ -48,11 +48,19 @@ public class HelloController {
 
                 // Eğer eşleşen bir kayıt bulunursa giriş başarılıdır
                 if (resultSet.next()) {
-                    String role = resultSet.getString("role"); // Kullanıcının yetkisini çek (Admin/Kasiyer)
-                    messageLabel.setStyle("-fx-text-fill: green;");
-                    messageLabel.setText("Giriş Başarılı! Hoşgeldin, " + username + " (" + role + ")");
+                    String role = resultSet.getString("role");
 
-                    // TODO: İlerleyen aşamalarda buraya ERP Ana Ekranına (Dashboard) geçiş kodlarını yazacağız.
+                    // Mevcut giriş (login) penceresini kapat
+                    usernameField.getScene().getWindow().hide();
+
+                    // Yeni Dashboard ekranını aç
+                    javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(HelloApplication.class.getResource("dashboard.fxml"));
+                    javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load(), 900, 600);
+                    javafx.stage.Stage stage = new javafx.stage.Stage();
+                    stage.setTitle("ERP Sistemi - Ana Ekran (" + role + ")");
+                    stage.setScene(scene);
+                    stage.show();
+
                 } else {
                     messageLabel.setStyle("-fx-text-fill: red;");
                     messageLabel.setText("Hatalı kullanıcı adı veya şifre!");
