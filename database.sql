@@ -59,7 +59,7 @@ CREATE TABLE invoices (
     FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE
 );
 
-USE erp_db;
+
 
 -- Sisteme 'admin' kullanıcı adıyla ve '123' şifresiyle bir yetkili ekliyoruz
 INSERT INTO users (username, password, role)
