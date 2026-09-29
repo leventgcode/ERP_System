@@ -42,8 +42,8 @@ CREATE TABLE sales (
 -- Satılan Ürünlerin Detayı (Satış ve Stok modülünü bağlar)
 CREATE TABLE sale_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    sale_id INT,
-    product_id INT,
+    sale_id INT NOT NULL,
+    product_id INT NOT NULL,
     quantity INT NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
