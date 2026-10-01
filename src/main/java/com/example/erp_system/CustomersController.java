@@ -17,14 +17,12 @@ import java.sql.Statement;
 
 public class CustomersController {
 
-    // Arayüzdeki form kutucukları
     @FXML private TextField nameField;
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
     @FXML private TextField addressField;
     @FXML private Label messageLabel;
 
-    // Arayüzdeki Tablo ve Sütunlar
     @FXML private TableView<Customer> customerTable;
     @FXML private TableColumn<Customer, Integer> colId;
     @FXML private TableColumn<Customer, String> colName;
@@ -32,24 +30,19 @@ public class CustomersController {
     @FXML private TableColumn<Customer, String> colEmail;
     @FXML private TableColumn<Customer, String> colAddress;
 
-    // Veritabanından gelen verileri tutacağımız liste
     private ObservableList<Customer> customerList;
 
-    // Sayfa açıldığı an otomatik olarak çalışacak metot
     @FXML
     public void initialize() {
-        // 1. Tablonun sütunlarını Customer sınıfındaki değişkenlerle eşleştiriyoruz
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
 
-        // 2. Verileri veritabanından çek ve tabloya doldur
         loadCustomerData();
     }
 
-    // Veritabanından müşterileri çeken (SELECT) metot
     private void loadCustomerData() {
         customerList = FXCollections.observableArrayList();
         String query = "SELECT * FROM customers";
@@ -58,7 +51,6 @@ public class CustomersController {
              Statement statement = conn.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
 
-            // Veritabanındaki her bir satır için döngü oluştur
             while (resultSet.next()) {
                 Customer customer = new Customer(
                         resultSet.getInt("id"),
@@ -67,10 +59,8 @@ public class CustomersController {
                         resultSet.getString("email"),
                         resultSet.getString("address")
                 );
-                customerList.add(customer); // Müşteriyi listeye ekle
+                customerList.add(customer);
             }
-
-            // Oluşturduğumuz bu listeyi arayüzdeki tabloya bağla
             customerTable.setItems(customerList);
 
         } catch (Exception e) {
@@ -80,7 +70,6 @@ public class CustomersController {
         }
     }
 
-    // --- YENİ MÜŞTERİ EKLEME İŞLEMİ ---
     @FXML
     protected void onAddCustomerClick(ActionEvent event) {
         String fullName = nameField.getText().trim();
@@ -110,12 +99,48 @@ public class CustomersController {
                 messageLabel.setStyle("-fx-text-fill: green;");
                 messageLabel.setText("Başarılı: Müşteri sisteme kaydedildi!");
                 clearForm();
-
-                // MÜTHİŞ DETAY: Yeni müşteri eklendikten sonra tabloyu anında güncelle!
                 loadCustomerData();
             } else {
                 messageLabel.setStyle("-fx-text-fill: red;");
                 messageLabel.setText("Hata: Kayıt işlemi başarısız oldu.");
+            }
+
+        } catch (Exception e) {
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText("Veritabanı Hatası: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // --- SEÇİLİ MÜŞTERİYİ SİLME İŞLEMİ ---
+    @FXML
+    protected void onDeleteCustomerClick(ActionEvent event) {
+        // Tablodan kullanıcının tıkladığı satırı al
+        Customer selectedCustomer = customerTable.getSelectionModel().getSelectedItem();
+
+        // Eğer hiçbir satır seçilmeden butona basıldıysa uyar
+        if (selectedCustomer == null) {
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText("Hata: Lütfen silmek için tablodan bir müşteri seçin!");
+            return;
+        }
+
+        String query = "DELETE FROM customers WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(query)) {
+
+            // Seçilen müşterinin ID'sini sorguya gönder
+            preparedStatement.setInt(1, selectedCustomer.getId());
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows > 0) {
+                messageLabel.setStyle("-fx-text-fill: green;");
+                messageLabel.setText("Başarılı: Müşteri sistemden silindi!");
+                loadCustomerData(); // Tabloyu hemen güncelle
+            } else {
+                messageLabel.setStyle("-fx-text-fill: red;");
+                messageLabel.setText("Hata: Silme işlemi başarısız oldu.");
             }
 
         } catch (Exception e) {

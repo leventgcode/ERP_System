@@ -28,7 +28,7 @@
         <TextField fx:id="addressField" promptText="Adres (İsteğe Bağlı)" HBox.hgrow="ALWAYS"/>
         <Button onAction="#onAddCustomerClick" prefHeight="25.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;" text="Yeni Müşteri Ekle" />
     </HBox>
-    <Label fx:id="messageLabel" textFill="red"/> <!-- Hata/Başarı Mesajı -->
+    <Label fx:id="messageLabel" textFill="red"/>
 
     <!-- Müşteri Listesi Tablosu -->
     <TableView fx:id="customerTable" VBox.vgrow="ALWAYS">
@@ -40,4 +40,9 @@
             <TableColumn fx:id="colAddress" prefWidth="250.0" text="Adres" />
         </columns>
     </TableView>
+
+    <!-- Silme Butonu Alanı -->
+    <HBox alignment="CENTER_RIGHT">
+        <Button onAction="#onDeleteCustomerClick" prefHeight="25.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;" text="Seçili Müşteriyi Sil" />
+    </HBox>
 </VBox>
