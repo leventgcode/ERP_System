@@ -12,29 +12,35 @@ import javafx.stage.Stage;
 public class DashboardController {
 
     @FXML
-    private BorderPane mainBorderPane; // Ana ekranın tamamını temsil eder
+    private BorderPane mainBorderPane;
 
     @FXML
     private Button logoutButton;
 
-    // --- MÜŞTERİLER BUTONUNA TIKLANINCA ÇALIŞACAK KOD ---
     @FXML
     protected void onCustomersButtonClick(ActionEvent event) {
         try {
-            // customers.fxml dosyasını hafızaya yükle
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("customers.fxml"));
             Node customersView = fxmlLoader.load();
-
-            // Yüklenen bu yeni sayfayı, ana ekranın tam ortasına (center) yerleştir
             mainBorderPane.setCenter(customersView);
-
         } catch (Exception e) {
             System.err.println("Müşteriler sayfası yüklenirken hata oluştu!");
             e.printStackTrace();
         }
     }
 
-    // --- ÇIKIŞ YAP BUTONUNA TIKLANINCA ÇALIŞACAK KOD ---
+    @FXML
+    protected void onProductsButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("products.fxml"));
+            Node productsView = fxmlLoader.load();
+            mainBorderPane.setCenter(productsView);
+        } catch (Exception e) {
+            System.err.println("Stok Yönetimi sayfası yüklenirken hata oluştu!");
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     protected void onLogoutButtonClick(ActionEvent event) {
         try {
