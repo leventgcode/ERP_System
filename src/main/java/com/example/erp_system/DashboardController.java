@@ -42,6 +42,18 @@ public class DashboardController {
     }
 
     @FXML
+    protected void onInvoicesButtonClick(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("invoices.fxml"));
+            Node invoicesView = fxmlLoader.load();
+            mainBorderPane.setCenter(invoicesView);
+        } catch (Exception e) {
+            System.err.println("Faturalar sayfası yüklenirken hata oluştu!");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     protected void onLogoutButtonClick(ActionEvent event) {
         try {
             Stage stage = (Stage) logoutButton.getScene().getWindow();
