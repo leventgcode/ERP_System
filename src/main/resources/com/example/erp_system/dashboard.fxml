@@ -8,7 +8,6 @@
 
 <BorderPane fx:id="mainBorderPane" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.erp_system.DashboardController">
 
-    <!-- Sol Menü -->
     <left>
         <VBox prefWidth="200.0" spacing="10.0" style="-fx-background-color: #2c3e50;" BorderPane.alignment="CENTER">
             <padding>
@@ -24,10 +23,7 @@
             </Label>
 
             <Button onAction="#onCustomersButtonClick" maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-cursor: hand;" text="Müşteriler" />
-
-            <!-- Buraya onAction eklendi -->
             <Button onAction="#onProductsButtonClick" maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-cursor: hand;" text="Stok Yönetimi" />
-
             <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-cursor: hand;" text="Faturalar" />
             <Button fx:id="logoutButton" onAction="#onLogoutButtonClick" maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-cursor: hand;" text="Çıkış Yap">
                 <VBox.margin>
@@ -37,7 +33,21 @@
         </VBox>
     </left>
 
-    <!-- Orta Ana Alan -->
     <center>
         <VBox alignment="CENTER" style="-fx-background-color: #ecf0f1;" BorderPane.alignment="CENTER">
-            <Label text="Sisteme Hoş Geldiniz!" textFill
+            <Label text="Sisteme Hoş Geldiniz!" textFill="#2c3e50">
+                <font>
+                    <Font name="System Bold" size="28.0" />
+                </font>
+            </Label>
+            <Label text="Sol menüden işlem yapmak istediğiniz modülü seçebilirsiniz." textFill="#7f8c8d">
+                <font>
+                    <Font size="16.0" />
+                </font>
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </Label>
+        </VBox>
+    </center>
+</BorderPane>
