@@ -30,6 +30,9 @@
     </HBox>
     <Label fx:id="messageLabel" textFill="red"/>
 
+    <!-- Arama Kutusu -->
+    <TextField fx:id="searchField" promptText="Müşteri ara (Ad, telefon, e-posta veya adres)..." />
+
     <!-- Müşteri Listesi Tablosu -->
     <TableView fx:id="customerTable" VBox.vgrow="ALWAYS">
         <columns>
