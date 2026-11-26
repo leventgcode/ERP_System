@@ -82,7 +82,7 @@ public class ProductsController {
 
     private void loadProductData() {
         productList.clear();
-        String query = "SELECT * FROM products";
+        String query = "SELECT * FROM products WHERE is_active = TRUE";
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement statement = conn.createStatement();
@@ -211,7 +211,8 @@ public class ProductsController {
             return;
         }
 
-        String query = "DELETE FROM products WHERE id = ?";
+        // Soft Delete: Ürünü pasife al (geçmiş faturalar bozulmaz)
+        String query = "UPDATE products SET is_active = FALSE WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
@@ -219,7 +220,7 @@ public class ProductsController {
             ps.setInt(1, selected.getId());
 
             if (ps.executeUpdate() > 0) {
-                showMessage("Başarılı: Ürün sistemden silindi!", false);
+                showMessage("Başarılı: Ürün listeden kaldırıldı!", false);
                 clearForm();
                 loadProductData();
             }

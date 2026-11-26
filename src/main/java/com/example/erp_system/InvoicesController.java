@@ -134,7 +134,7 @@ public class InvoicesController {
 
     private void loadProducts() {
         ObservableList<Product> products = FXCollections.observableArrayList();
-        String query = "SELECT * FROM products WHERE stock_quantity > 0";
+        String query = "SELECT * FROM products WHERE stock_quantity > 0 AND is_active = TRUE";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(query)) {

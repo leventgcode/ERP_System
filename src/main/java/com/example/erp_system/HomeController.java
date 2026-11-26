@@ -46,7 +46,7 @@ public class HomeController {
                 }
             }
 
-            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM products")) {
+            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM products WHERE is_active = TRUE")) {
                 if (rs.next()) {
                     totalProductsLabel.setText(String.valueOf(rs.getInt(1)));
                 }
@@ -58,7 +58,7 @@ public class HomeController {
                 }
             }
 
-            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM products WHERE stock_quantity < 5")) {
+            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM products WHERE stock_quantity < 5 AND is_active = TRUE")) {
                 if (rs.next()) {
                     criticalStockLabel.setText(String.valueOf(rs.getInt(1)));
                 }
@@ -71,7 +71,7 @@ public class HomeController {
 
     private void loadCriticalStockProducts() {
         ObservableList<Product> criticalList = FXCollections.observableArrayList();
-        String query = "SELECT * FROM products WHERE stock_quantity < 5 ORDER BY stock_quantity ASC";
+        String query = "SELECT * FROM products WHERE stock_quantity < 5 AND is_active = TRUE ORDER BY stock_quantity ASC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement st = conn.createStatement();
