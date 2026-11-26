@@ -18,37 +18,37 @@ public class DashboardController {
     private Button logoutButton;
 
     @FXML
+    public void initialize() {
+        loadView("home.fxml");
+    }
+
+    @FXML
+    protected void onHomeButtonClick(ActionEvent event) {
+        loadView("home.fxml");
+    }
+
+    @FXML
     protected void onCustomersButtonClick(ActionEvent event) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("customers.fxml"));
-            Node customersView = fxmlLoader.load();
-            mainBorderPane.setCenter(customersView);
-        } catch (Exception e) {
-            System.err.println("Müşteriler sayfası yüklenirken hata oluştu!");
-            e.printStackTrace();
-        }
+        loadView("customers.fxml");
     }
 
     @FXML
     protected void onProductsButtonClick(ActionEvent event) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("products.fxml"));
-            Node productsView = fxmlLoader.load();
-            mainBorderPane.setCenter(productsView);
-        } catch (Exception e) {
-            System.err.println("Stok Yönetimi sayfası yüklenirken hata oluştu!");
-            e.printStackTrace();
-        }
+        loadView("products.fxml");
     }
 
     @FXML
     protected void onInvoicesButtonClick(ActionEvent event) {
+        loadView("invoices.fxml");
+    }
+
+    private void loadView(String fxmlFile) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("invoices.fxml"));
-            Node invoicesView = fxmlLoader.load();
-            mainBorderPane.setCenter(invoicesView);
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(fxmlFile));
+            Node view = fxmlLoader.load();
+            mainBorderPane.setCenter(view);
         } catch (Exception e) {
-            System.err.println("Faturalar sayfası yüklenirken hata oluştu!");
+            System.err.println(fxmlFile + " yüklenirken hata oluştu!");
             e.printStackTrace();
         }
     }

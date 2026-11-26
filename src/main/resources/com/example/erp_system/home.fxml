@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="20.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.erp_system.HomeController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label text="Genel Bakış" textFill="#2c3e50">
+        <font>
+            <Font name="System Bold" size="24.0" />
+        </font>
+    </Label>
+
+    <!-- İstatistik Kartları -->
+    <HBox spacing="15.0">
+        <!-- Toplam Müşteri -->
+        <VBox spacing="8.0" HBox.hgrow="ALWAYS" style="-fx-background-color: #2980b9; -fx-background-radius: 8; -fx-padding: 18;">
+            <Label text="Toplam Müşteri" textFill="#d6eaf8">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+            <Label fx:id="totalCustomersLabel" text="0" textFill="WHITE">
+                <font>
+                    <Font name="System Bold" size="26.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Toplam Ürün -->
+        <VBox spacing="8.0" HBox.hgrow="ALWAYS" style="-fx-background-color: #8e44ad; -fx-background-radius: 8; -fx-padding: 18;">
+            <Label text="Toplam Ürün Çeşidi" textFill="#ebdef0">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+            <Label fx:id="totalProductsLabel" text="0" textFill="WHITE">
+                <font>
+                    <Font name="System Bold" size="26.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Toplam Ciro -->
+        <VBox spacing="8.0" HBox.hgrow="ALWAYS" style="-fx-background-color: #27ae60; -fx-background-radius: 8; -fx-padding: 18;">
+            <Label text="Toplam Ciro" textFill="#d4efdf">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+            <Label fx:id="totalRevenueLabel" text="0.00 TL" textFill="WHITE">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Kritik Stok -->
+        <VBox spacing="8.0" HBox.hgrow="ALWAYS" style="-fx-background-color: #c0392b; -fx-background-radius: 8; -fx-padding: 18;">
+            <Label text="Kritik Stok (&lt; 5)" textFill="#fadbd8">
+                <font>
+                    <Font size="13.0" />
+                </font>
+            </Label>
+            <Label fx:id="criticalStockLabel" text="0" textFill="WHITE">
+                <font>
+                    <Font name="System Bold" size="26.0" />
+                </font>
+            </Label>
+        </VBox>
+    </HBox>
+
+    <!-- Kritik Stok Tablosu -->
+    <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+        <Label text="Kritik Stok Uyarı Listesi (5 Adet Altı Ürünler)" textFill="#2c3e50">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Label>
+
+        <TableView fx:id="criticalStockTable" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colBarcode" prefWidth="140.0" text="Barkod" />
+                <TableColumn fx:id="colName" prefWidth="280.0" text="Ürün Adı" />
+                <TableColumn fx:id="colPrice" prefWidth="120.0" text="Fiyat (TL)" />
+                <TableColumn fx:id="colStock" prefWidth="110.0" text="Kalan Stok" />
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>
