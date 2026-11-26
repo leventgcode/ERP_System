@@ -24,64 +24,65 @@
     </Label>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <tabs>
-            <!-- 1. SEKME: YENİ SATIŞ VE FATURA KESME -->
-            <Tab text="Yeni Satış / Fatura Kes">
-                <VBox spacing="12.0" style="-fx-background-color: #ecf0f1;">
-                    <padding>
-                        <Insets bottom="10.0" left="5.0" right="5.0" top="15.0" />
-                    </padding>
+        <!-- 1. SEKME: YENİ SATIŞ VE FATURA KESME -->
+        <Tab text="Yeni Satış / Fatura Kes">
+            <VBox spacing="12.0" style="-fx-background-color: #ecf0f1;">
+                <padding>
+                    <Insets bottom="10.0" left="5.0" right="5.0" top="15.0" />
+                </padding>
 
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <Label text="Müşteri:" />
-                        <ComboBox fx:id="customerComboBox" prefWidth="220.0" promptText="Müşteri Seçin" />
-                        <Label text="Ürün:" />
-                        <ComboBox fx:id="productComboBox" prefWidth="240.0" promptText="Ürün Seçin" />
-                        <TextField fx:id="quantityField" prefWidth="70.0" promptText="Adet" />
-                        <Button onAction="#onAddToCartClick" style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-cursor: hand;" text="Sepete Ekle" />
-                    </HBox>
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="Müşteri:" />
+                    <ComboBox fx:id="customerComboBox" prefWidth="220.0" promptText="Müşteri Seçin" />
+                    <Label text="Ürün:" />
+                    <ComboBox fx:id="productComboBox" prefWidth="240.0" promptText="Ürün Seçin" />
+                    <TextField fx:id="quantityField" prefWidth="70.0" promptText="Adet" />
+                    <Button onAction="#onAddToCartClick" style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-cursor: hand;" text="Sepete Ekle" />
+                </HBox>
 
-                    <Label fx:id="messageLabel" textFill="red" />
+                <Label fx:id="messageLabel" textFill="red" />
 
-                    <TableView fx:id="cartTable" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colCartProduct" prefWidth="260.0" text="Ürün Adı" />
-                            <TableColumn fx:id="colCartQuantity" prefWidth="90.0" text="Adet" />
-                            <TableColumn fx:id="colCartUnitPrice" prefWidth="120.0" text="Birim Fiyat (TL)" />
-                            <TableColumn fx:id="colCartSubtotal" prefWidth="130.0" text="Ara Toplam (TL)" />
-                        </columns>
-                    </TableView>
+                <TableView fx:id="cartTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colCartProduct" prefWidth="260.0" text="Ürün Adı" />
+                        <TableColumn fx:id="colCartQuantity" prefWidth="90.0" text="Adet" />
+                        <TableColumn fx:id="colCartUnitPrice" prefWidth="120.0" text="Birim Fiyat (TL)" />
+                        <TableColumn fx:id="colCartSubtotal" prefWidth="130.0" text="Ara Toplam (TL)" />
+                    </columns>
+                </TableView>
 
-                    <HBox alignment="CENTER_RIGHT" spacing="15.0">
-                        <Button onAction="#onRemoveFromCartClick" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;" text="Seçili Ürünü Çıkar" />
-                        <Label fx:id="totalLabel" text="Toplam: 0.00 TL" textFill="#2c3e50">
-                            <font>
-                                <Font name="System Bold" size="18.0" />
-                            </font>
-                        </Label>
-                        <Button onAction="#onCompleteSaleClick" prefHeight="35.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Satışı Tamamla &amp; Fatura Kes" />
-                    </HBox>
-                </VBox>
-            </Tab>
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <Button onAction="#onRemoveFromCartClick" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;" text="Seçili Ürünü Çıkar" />
+                    <Label fx:id="totalLabel" text="Toplam: 0.00 TL" textFill="#2c3e50">
+                        <font>
+                            <Font name="System Bold" size="18.0" />
+                        </font>
+                    </Label>
+                    <Button onAction="#onCompleteSaleClick" prefHeight="35.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Satışı Tamamla &amp; Fatura Kes" />
+                </HBox>
+            </VBox>
+        </Tab>
 
-            <!-- 2. SEKME: KESİLEN FATURALAR -->
-            <Tab text="Kesilen Faturalar">
-                <VBox spacing="10.0" style="-fx-background-color: #ecf0f1;">
-                    <padding>
-                        <Insets bottom="10.0" left="5.0" right="5.0" top="15.0" />
-                    </padding>
+        <!-- 2. SEKME: KESİLEN FATURALAR -->
+        <Tab text="Kesilen Faturalar">
+            <VBox spacing="10.0" style="-fx-background-color: #ecf0f1;">
+                <padding>
+                    <Insets bottom="10.0" left="5.0" right="5.0" top="15.0" />
+                </padding>
 
-                    <TableView fx:id="invoiceTable" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colInvId" prefWidth="60.0" text="ID" />
-                            <TableColumn fx:id="colInvNumber" prefWidth="160.0" text="Fatura No" />
-                            <TableColumn fx:id="colInvCustomer" prefWidth="220.0" text="Müşteri" />
-                            <TableColumn fx:id="colInvTotal" prefWidth="130.0" text="Tutar (TL)" />
-                            <TableColumn fx:id="colInvDate" prefWidth="160.0" text="Tarih" />
-                        </columns>
-                    </TableView>
-                </VBox>
-            </Tab>
-        </tabs>
+                <!-- Fatura Arama Kutusu -->
+                <TextField fx:id="invoiceSearchField" promptText="Fatura ara (Fatura no, müşteri adı veya tarih)..." />
+
+                <TableView fx:id="invoiceTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInvId" prefWidth="60.0" text="ID" />
+                        <TableColumn fx:id="colInvNumber" prefWidth="160.0" text="Fatura No" />
+                        <TableColumn fx:id="colInvCustomer" prefWidth="220.0" text="Müşteri" />
+                        <TableColumn fx:id="colInvTotal" prefWidth="130.0" text="Tutar (TL)" />
+                        <TableColumn fx:id="colInvDate" prefWidth="160.0" text="Tarih" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
     </TabPane>
 </VBox>

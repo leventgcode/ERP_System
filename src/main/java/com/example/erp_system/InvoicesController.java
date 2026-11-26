@@ -2,6 +2,8 @@ package com.example.erp_system;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -18,12 +20,14 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
 import java.time.Year;
+import java.util.Locale;
 
 public class InvoicesController {
 
     @FXML private ComboBox<Customer> customerComboBox;
     @FXML private ComboBox<Product> productComboBox;
     @FXML private TextField quantityField;
+    @FXML private TextField invoiceSearchField;
     @FXML private Label messageLabel;
     @FXML private Label totalLabel;
 
@@ -41,24 +45,23 @@ public class InvoicesController {
     @FXML private TableColumn<Invoice, String> colInvDate;
 
     private final ObservableList<CartItem> cartList = FXCollections.observableArrayList();
+    private final ObservableList<Invoice> invoiceList = FXCollections.observableArrayList();
+    private final Locale trLocale = Locale.forLanguageTag("tr");
 
     @FXML
     public void initialize() {
-        // Sepet tablosu sütunları
         colCartProduct.setCellValueFactory(new PropertyValueFactory<>("productName"));
         colCartQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colCartUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
         colCartSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
         cartTable.setItems(cartList);
 
-        // Faturalar tablosu sütunları
         colInvId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colInvNumber.setCellValueFactory(new PropertyValueFactory<>("invoiceNumber"));
         colInvCustomer.setCellValueFactory(new PropertyValueFactory<>("customerName"));
         colInvTotal.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
         colInvDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        // ComboBox görünüm ayarları
         customerComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Customer c) {
@@ -77,9 +80,35 @@ public class InvoicesController {
             public Product fromString(String s) { return null; }
         });
 
+        setupInvoiceSearchFilter();
         loadCustomers();
         loadProducts();
         loadInvoices();
+    }
+
+    private void setupInvoiceSearchFilter() {
+        FilteredList<Invoice> filteredInvoices = new FilteredList<>(invoiceList, b -> true);
+
+        invoiceSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredInvoices.setPredicate(invoice -> {
+                if (newValue == null || newValue.isBlank()) {
+                    return true;
+                }
+                String keyword = newValue.toLowerCase(trLocale).trim();
+
+                return containsIgnoreCase(invoice.getInvoiceNumber(), keyword)
+                        || containsIgnoreCase(invoice.getCustomerName(), keyword)
+                        || containsIgnoreCase(invoice.getCreatedAt(), keyword);
+            });
+        });
+
+        SortedList<Invoice> sortedInvoices = new SortedList<>(filteredInvoices);
+        sortedInvoices.comparatorProperty().bind(invoiceTable.comparatorProperty());
+        invoiceTable.setItems(sortedInvoices);
+    }
+
+    private boolean containsIgnoreCase(String field, String keyword) {
+        return field != null && field.toLowerCase(trLocale).contains(keyword);
     }
 
     private void loadCustomers() {
@@ -125,7 +154,7 @@ public class InvoicesController {
     }
 
     private void loadInvoices() {
-        ObservableList<Invoice> invoices = FXCollections.observableArrayList();
+        invoiceList.clear();
         String query = """
                 SELECT i.id, i.invoice_number,
                        COALESCE(c.full_name, 'Silinmiş Müşteri') AS customer_name,
@@ -139,7 +168,7 @@ public class InvoicesController {
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
-                invoices.add(new Invoice(
+                invoiceList.add(new Invoice(
                         rs.getInt("id"),
                         rs.getString("invoice_number"),
                         rs.getString("customer_name"),
@@ -147,7 +176,6 @@ public class InvoicesController {
                         rs.getString("created_at")
                 ));
             }
-            invoiceTable.setItems(invoices);
         } catch (Exception e) {
             showMessage("Faturalar yüklenemedi!", true);
             e.printStackTrace();
@@ -176,7 +204,6 @@ public class InvoicesController {
             return;
         }
 
-        // Sepette bu ürün zaten varsa toplam adedi stokla karşılaştır
         CartItem existingItem = null;
         for (CartItem item : cartList) {
             if (item.getProductId() == selectedProduct.getId()) {
@@ -234,10 +261,9 @@ public class InvoicesController {
         double totalAmount = calculateTotal();
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            conn.setAutoCommit(false); // Transaction başlat
+            conn.setAutoCommit(false);
 
             try {
-                // 1. Satış kaydını oluştur (sales)
                 int saleId = -1;
                 String saleQuery = "INSERT INTO sales (customer_id, user_id, total_amount) VALUES (?, ?, ?)";
                 try (PreparedStatement psSale = conn.prepareStatement(saleQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -253,7 +279,6 @@ public class InvoicesController {
                     }
                 }
 
-                // 2. Satılan ürünleri kaydet (sale_items) ve stoktan düş (products)
                 String itemQuery = "INSERT INTO sale_items (sale_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)";
                 String stockQuery = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?";
 
@@ -272,7 +297,6 @@ public class InvoicesController {
                     }
                 }
 
-                // 3. Faturayı oluştur (invoices)
                 String invoiceNumber = "INV-" + Year.now().getValue() + "-" + String.format("%04d", saleId);
                 String invoiceQuery = "INSERT INTO invoices (sale_id, invoice_number) VALUES (?, ?)";
                 try (PreparedStatement psInv = conn.prepareStatement(invoiceQuery)) {
@@ -281,18 +305,18 @@ public class InvoicesController {
                     psInv.executeUpdate();
                 }
 
-                conn.commit(); // Her şey başarılıysa onayla
+                conn.commit();
 
                 cartList.clear();
                 updateTotalLabel();
                 customerComboBox.setValue(null);
                 productComboBox.setValue(null);
-                loadProducts(); // Güncel stokları yenile
-                loadInvoices(); // Fatura listesini yenile
+                loadProducts();
+                loadInvoices();
                 showMessage("Başarılı! Fatura kesildi: " + invoiceNumber, false);
 
             } catch (Exception ex) {
-                conn.rollback(); // Hata olursa tüm işlemleri geri al
+                conn.rollback();
                 throw ex;
             }
         } catch (Exception e) {

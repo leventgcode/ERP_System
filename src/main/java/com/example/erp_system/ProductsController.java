@@ -2,6 +2,8 @@ package com.example.erp_system;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -15,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Locale;
 
 public class ProductsController {
 
@@ -22,6 +25,7 @@ public class ProductsController {
     @FXML private TextField nameField;
     @FXML private TextField priceField;
     @FXML private TextField stockField;
+    @FXML private TextField searchField;
     @FXML private Label messageLabel;
 
     @FXML private TableView<Product> productTable;
@@ -31,7 +35,8 @@ public class ProductsController {
     @FXML private TableColumn<Product, Double> colPrice;
     @FXML private TableColumn<Product, Integer> colStock;
 
-    private ObservableList<Product> productList;
+    private final ObservableList<Product> productList = FXCollections.observableArrayList();
+    private final Locale trLocale = Locale.forLanguageTag("tr");
 
     @FXML
     public void initialize() {
@@ -41,7 +46,6 @@ public class ProductsController {
         colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
         colStock.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
 
-        // Tablodan bir ürüne tıklandığında bilgileri güncelleme için kutulara doldur
         productTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 barcodeField.setText(newSelection.getBarcode() != null ? newSelection.getBarcode() : "");
@@ -51,11 +55,33 @@ public class ProductsController {
             }
         });
 
+        setupSearchFilter();
         loadProductData();
     }
 
+    private void setupSearchFilter() {
+        FilteredList<Product> filteredData = new FilteredList<>(productList, b -> true);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(product -> {
+                if (newValue == null || newValue.isBlank()) {
+                    return true;
+                }
+                String keyword = newValue.toLowerCase(trLocale).trim();
+
+                boolean matchBarcode = product.getBarcode() != null && product.getBarcode().toLowerCase(trLocale).contains(keyword);
+                boolean matchName = product.getName() != null && product.getName().toLowerCase(trLocale).contains(keyword);
+                return matchBarcode || matchName;
+            });
+        });
+
+        SortedList<Product> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(productTable.comparatorProperty());
+        productTable.setItems(sortedData);
+    }
+
     private void loadProductData() {
-        productList = FXCollections.observableArrayList();
+        productList.clear();
         String query = "SELECT * FROM products";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -63,16 +89,14 @@ public class ProductsController {
              ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
-                Product product = new Product(
+                productList.add(new Product(
                         resultSet.getInt("id"),
                         resultSet.getString("barcode"),
                         resultSet.getString("name"),
                         resultSet.getDouble("price"),
                         resultSet.getInt("stock_quantity")
-                );
-                productList.add(product);
+                ));
             }
-            productTable.setItems(productList);
 
         } catch (Exception e) {
             showMessage("Tablo yüklenirken hata oluştu!", true);
