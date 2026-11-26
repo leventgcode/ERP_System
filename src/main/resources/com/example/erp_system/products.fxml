@@ -31,6 +31,9 @@
     </HBox>
     <Label fx:id="messageLabel" textFill="red"/>
 
+    <!-- Arama Kutusu -->
+    <TextField fx:id="searchField" promptText="Ürün ara (Barkod veya ürün adı)..." />
+
     <!-- Ürün Listesi Tablosu -->
     <TableView fx:id="productTable" VBox.vgrow="ALWAYS">
         <columns>

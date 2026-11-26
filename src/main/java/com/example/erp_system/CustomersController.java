@@ -2,6 +2,8 @@ package com.example.erp_system;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -14,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Locale;
 
 public class CustomersController {
 
@@ -21,6 +24,7 @@ public class CustomersController {
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
     @FXML private TextField addressField;
+    @FXML private TextField searchField;
     @FXML private Label messageLabel;
 
     @FXML private TableView<Customer> customerTable;
@@ -30,7 +34,8 @@ public class CustomersController {
     @FXML private TableColumn<Customer, String> colEmail;
     @FXML private TableColumn<Customer, String> colAddress;
 
-    private ObservableList<Customer> customerList;
+    private final ObservableList<Customer> customerList = FXCollections.observableArrayList();
+    private final Locale trLocale = Locale.forLanguageTag("tr");
 
     @FXML
     public void initialize() {
@@ -40,11 +45,38 @@ public class CustomersController {
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
 
+        setupSearchFilter();
         loadCustomerData();
     }
 
+    private void setupSearchFilter() {
+        FilteredList<Customer> filteredData = new FilteredList<>(customerList, b -> true);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(customer -> {
+                if (newValue == null || newValue.isBlank()) {
+                    return true;
+                }
+                String keyword = newValue.toLowerCase(trLocale).trim();
+
+                return containsIgnoreCase(customer.getFullName(), keyword)
+                        || containsIgnoreCase(customer.getPhone(), keyword)
+                        || containsIgnoreCase(customer.getEmail(), keyword)
+                        || containsIgnoreCase(customer.getAddress(), keyword);
+            });
+        });
+
+        SortedList<Customer> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(customerTable.comparatorProperty());
+        customerTable.setItems(sortedData);
+    }
+
+    private boolean containsIgnoreCase(String field, String keyword) {
+        return field != null && field.toLowerCase(trLocale).contains(keyword);
+    }
+
     private void loadCustomerData() {
-        customerList = FXCollections.observableArrayList();
+        customerList.clear();
         String query = "SELECT * FROM customers";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -52,16 +84,14 @@ public class CustomersController {
              ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
-                Customer customer = new Customer(
+                customerList.add(new Customer(
                         resultSet.getInt("id"),
                         resultSet.getString("full_name"),
                         resultSet.getString("phone"),
                         resultSet.getString("email"),
                         resultSet.getString("address")
-                );
-                customerList.add(customer);
+                ));
             }
-            customerTable.setItems(customerList);
 
         } catch (Exception e) {
             messageLabel.setStyle("-fx-text-fill: red;");
@@ -93,9 +123,7 @@ public class CustomersController {
             preparedStatement.setString(3, email);
             preparedStatement.setString(4, address);
 
-            int affectedRows = preparedStatement.executeUpdate();
-
-            if (affectedRows > 0) {
+            if (preparedStatement.executeUpdate() > 0) {
                 messageLabel.setStyle("-fx-text-fill: green;");
                 messageLabel.setText("Başarılı: Müşteri sisteme kaydedildi!");
                 clearForm();
@@ -112,13 +140,10 @@ public class CustomersController {
         }
     }
 
-    // --- SEÇİLİ MÜŞTERİYİ SİLME İŞLEMİ ---
     @FXML
     protected void onDeleteCustomerClick(ActionEvent event) {
-        // Tablodan kullanıcının tıkladığı satırı al
         Customer selectedCustomer = customerTable.getSelectionModel().getSelectedItem();
 
-        // Eğer hiçbir satır seçilmeden butona basıldıysa uyar
         if (selectedCustomer == null) {
             messageLabel.setStyle("-fx-text-fill: red;");
             messageLabel.setText("Hata: Lütfen silmek için tablodan bir müşteri seçin!");
@@ -130,14 +155,12 @@ public class CustomersController {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
 
-            // Seçilen müşterinin ID'sini sorguya gönder
             preparedStatement.setInt(1, selectedCustomer.getId());
-            int affectedRows = preparedStatement.executeUpdate();
 
-            if (affectedRows > 0) {
+            if (preparedStatement.executeUpdate() > 0) {
                 messageLabel.setStyle("-fx-text-fill: green;");
                 messageLabel.setText("Başarılı: Müşteri sistemden silindi!");
-                loadCustomerData(); // Tabloyu hemen güncelle
+                loadCustomerData();
             } else {
                 messageLabel.setStyle("-fx-text-fill: red;");
                 messageLabel.setText("Hata: Silme işlemi başarısız oldu.");
